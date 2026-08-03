@@ -1,0 +1,20 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Builds de export (binários gerados, não código-fonte)
+export.cfg
+export_credentials.cfg
+/build/
+/exported/
+
+# Arquivos de importação gerados automaticamente
+# (o Godot recria a partir dos originais na pasta assets/)
+*.import
+
+# Logs
+*.log
+
+# Arquivos temporários do sistema (Linux/editor de texto)
+*~
+.DS_Store
