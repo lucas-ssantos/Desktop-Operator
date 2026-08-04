@@ -16,6 +16,7 @@ extends AnimatedSprite2D
 @export var max_sleep_time: float = 90.0
 
 @onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
+@onready var click_area: Area2D = $ClickArea
 
 enum State { IDLE, WALKING, SITTING, SLEEPING, CLICKED }
 var state: State = State.IDLE
@@ -38,14 +39,18 @@ func _get_half_width() -> float:
 	# fallback, caso o shape não esteja configurado ainda
 	return _get_sprite_width() / 2.0
 
+func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		_enter_clicked()
+
 func _ready():
+	
+	click_area.input_event.connect(_on_click_area_input_event)
+	get_viewport().physics_object_picking = true  # garante que a viewport processa clique em Area2D
+	
 	animation_finished.connect(_on_animation_finished)
 	randomize()
 	_enter_idle()
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_enter_clicked()
 
 func _enter_clicked():
 	if state == State.CLICKED:
