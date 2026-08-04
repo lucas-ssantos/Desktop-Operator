@@ -5,38 +5,30 @@ extends AnimatedSprite2D
 @export var max_idle_time: float = 30.0
 @export var arrival_threshold: float = 4.0
 
+@onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
+
 enum State { IDLE, WALKING, CLICKED }
 var state: State = State.IDLE
 
-var win: Window
 var target_x: float
-var screen_width: int
+
+func _get_sprite_width() -> int:
+	if sprite_frames == null:
+		return 96
+	var anim_name := "idle" if sprite_frames.has_animation("idle") else sprite_frames.get_animation_names()[0]
+	var texture := sprite_frames.get_frame_texture(anim_name, 0)
+	if texture == null:
+		return 96
+	return int(texture.get_size().x * scale.x)
+
+func _get_half_width() -> float:
+	if click_collision and click_collision.shape is RectangleShape2D:
+		var rect_shape := click_collision.shape as RectangleShape2D
+		return (rect_shape.size.x / 2.0) * scale.x
+	# fallback, caso o shape não esteja configurado ainda
+	return _get_sprite_width() / 2.0
 
 func _ready():
-	win = get_window()
-	win.borderless = true
-	win.transparent_bg = true
-	win.always_on_top = true
-	win.unresizable = true
-
-	# altura vem do tamanho de design do projeto (o mesmo 1920x550 que você vê no editor 2D)
-	var window_height: int = ProjectSettings.get_setting("display/window/size/viewport_height")
-	var window_width: int = ProjectSettings.get_setting("display/window/size/viewport_width")
-
-	var usable_rect: Rect2i
-	if OS.get_name() == "Windows":
-		usable_rect = DisplayServer.screen_get_usable_rect()
-	else:
-		usable_rect = Rect2i(Vector2i.ZERO, DisplayServer.screen_get_size())
-
-	var floor_y = usable_rect.position.y + usable_rect.size.y - window_height
-
-	win.size = Vector2i(window_width, window_height)
-	win.position = Vector2i(usable_rect.position.x, floor_y)
-
-	# NADA de mexer em position.x/position.y do personagem aqui —
-	# fica exatamente onde você deixou no editor
-
 	animation_finished.connect(_on_animation_finished)
 	randomize()
 	_enter_idle()
@@ -64,9 +56,16 @@ func _enter_idle():
 		_pick_new_target()
 
 func _pick_new_target():
-	var min_x = screen_width * 0.1
-	var max_x = screen_width * 0.9
-	target_x = randf_range(min_x, max_x)
+	var half_width = _get_half_width()
+	var window_width = get_window().size.x
+	var min_x = half_width
+	var max_x = window_width - half_width
+
+	if max_x <= min_x:
+		target_x = window_width / 2.0
+	else:
+		target_x = randf_range(min_x, max_x)
+
 	state = State.WALKING
 	play("walking")
 
@@ -79,6 +78,10 @@ func _process(delta):
 		flip_h = direction < 0
 
 	position.x += direction * speed * delta
+
+	# trava contra as bordas da janela, usando a largura real do personagem
+	var half_width = _get_half_width()
+	position.x = clamp(position.x, half_width, get_window().size.x - half_width)
 
 	if abs(target_x - position.x) <= arrival_threshold:
 		position.x = target_x
