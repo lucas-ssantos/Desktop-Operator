@@ -512,6 +512,7 @@
 [ext_resource type="Texture2D" uid="uid://rjmu03v25enl" path="res://chibis/nian/frames/walking/frame_00078.png" id="508_icls0"]
 [ext_resource type="Texture2D" uid="uid://d2ht70c4wk2uf" path="res://chibis/nian/frames/walking/frame_00079.png" id="509_qndl3"]
 [ext_resource type="Texture2D" uid="uid://cc6bgpsdmco4s" path="res://chibis/nian/frames/walking/frame_00080.png" id="510_kgqu3"]
+[ext_resource type="Script" uid="uid://b766p0jng6kqr" path="res://cenas/main/scripts/close_button.gd" id="513_dje04"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eoyq7"]
 shader = ExtResource("1_eoyq7")
@@ -2075,6 +2076,20 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nusuv"]
 size = Vector2(116.66667, 186.66669)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dje04"]
+bg_color = Color(0.6, 0, 0, 0.34901962)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ilp8h"]
+bg_color = Color(0.6, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
 [node name="Main" type="Node2D" unique_id=1033299362]
 script = ExtResource("1_x46m8")
 
@@ -2096,7 +2111,7 @@ material = SubResource("ShaderMaterial_eoyq7")
 position = Vector2(49.000004, 101)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_vabh6")
-animation = &"walking"
+animation = &"sleeping"
 speed_scale = 5.0
 script = ExtResource("55_2dljx")
 
@@ -2105,5 +2120,17 @@ script = ExtResource("55_2dljx")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Control/Operator/ClickArea" unique_id=1971718856]
 position = Vector2(11.6666565, -10)
 shape = SubResource("RectangleShape2D_nusuv")
+
+[node name="UI" type="CanvasLayer" parent="Control" unique_id=1202346665]
+
+[node name="Button" type="Button" parent="Control/UI" unique_id=826698927]
+offset_left = 626.0
+offset_right = 655.0
+offset_bottom = 31.0
+scale = Vector2(0.47596744, 0.47596744)
+theme_override_styles/normal = SubResource("StyleBoxFlat_dje04")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ilp8h")
+text = "X"
+script = ExtResource("513_dje04")
 
 [connection signal="input_event" from="Control/Operator/ClickArea" to="Control/Operator" method="_on_click_area_input_event"]
