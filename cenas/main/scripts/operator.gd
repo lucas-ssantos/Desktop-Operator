@@ -21,6 +21,7 @@ func _ready():
 
 	# altura vem do tamanho de design do projeto (o mesmo 1920x550 que você vê no editor 2D)
 	var window_height: int = ProjectSettings.get_setting("display/window/size/viewport_height")
+	var window_width: int = ProjectSettings.get_setting("display/window/size/viewport_width")
 
 	var usable_rect: Rect2i
 	if OS.get_name() == "Windows":
@@ -28,10 +29,9 @@ func _ready():
 	else:
 		usable_rect = Rect2i(Vector2i.ZERO, DisplayServer.screen_get_size())
 
-	screen_width = usable_rect.size.x
 	var floor_y = usable_rect.position.y + usable_rect.size.y - window_height
 
-	win.size = Vector2i(screen_width, window_height)
+	win.size = Vector2i(window_width, window_height)
 	win.position = Vector2i(usable_rect.position.x, floor_y)
 
 	# NADA de mexer em position.x/position.y do personagem aqui —
