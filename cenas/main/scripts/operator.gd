@@ -17,11 +17,13 @@ extends AnimatedSprite2D
 
 @onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
 @onready var click_area: Area2D = $ClickArea
+@onready var audio_player: AudioStreamPlayer2D = $AudioStreamPlayer
 
 enum State { IDLE, WALKING, SITTING, SLEEPING, CLICKED }
 var state: State = State.IDLE
 
 var target_x: float
+var current_audio: Dictionary = {}
 
 func _get_sprite_width() -> int:
 	if sprite_frames == null:
@@ -36,7 +38,6 @@ func _get_half_width() -> float:
 	if click_collision and click_collision.shape is RectangleShape2D:
 		var rect_shape := click_collision.shape as RectangleShape2D
 		return (rect_shape.size.x / 2.0) * scale.x
-	# fallback, caso o shape não esteja configurado ainda
 	return _get_sprite_width() / 2.0
 
 func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
@@ -44,18 +45,31 @@ func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: 
 		_enter_clicked()
 
 func _ready():
-	
 	get_viewport().physics_object_picking = true  # garante que a viewport processa clique em Area2D
-	
+
 	animation_finished.connect(_on_animation_finished)
 	randomize()
 	_enter_idle()
+
+func set_character(character_name: String, skin_name: String = "default"):
+	sprite_frames = CharacterManager.load_character_frames(character_name, skin_name)
+	current_audio = CharacterManager.load_character_audio(character_name, skin_name)
+	state = State.IDLE
+	play("idle")
+
+func _play_random_audio(category: String):
+	if not current_audio.has(category) or current_audio[category].is_empty():
+		return
+	var streams: Array = current_audio[category]
+	audio_player.stream = streams[randi() % streams.size()]
+	audio_player.play()
 
 func _enter_clicked():
 	if state == State.CLICKED:
 		return
 	state = State.CLICKED
 	play("click")
+	_play_random_audio("click")
 
 func _on_animation_finished():
 	if animation == "click":
@@ -119,20 +133,9 @@ func _process(delta):
 
 	position.x += direction * speed * delta
 
-	# trava contra as bordas da janela, usando a largura real do personagem
 	var half_width = _get_half_width()
 	position.x = clamp(position.x, half_width, get_window().size.x - half_width)
 
 	if abs(target_x - position.x) <= arrival_threshold:
 		position.x = target_x
 		_enter_idle()
-
-func set_character(character_name: String):
-	sprite_frames = CharacterManager.load_character_frames(character_name)
-	state = State.IDLE
-	play("idle")
-
-
-func _on_character_dropdown_character_selected(character_name: String) -> void:
-	set_character(character_name)
-	pass # Replace with function body.

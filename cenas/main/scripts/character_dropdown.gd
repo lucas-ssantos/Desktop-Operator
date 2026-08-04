@@ -1,45 +1,48 @@
 extends Control
 
-signal character_selected(character_name: String)
+signal item_selected(item_name: String)
 
 @onready var select_button: Button = $SelectButton
 @onready var popup: PopupPanel = $Popup
 @onready var search_box: LineEdit = $Popup/VBoxContainer/SearchBox
 @onready var item_list: ItemList = $Popup/VBoxContainer/ItemList
 
-var all_characters: Array[String] = []
+var all_items: Array[String] = []
 
 var last_popup_hide_time: int = -1000
 const REOPEN_GUARD_MS: int = 150
 
-func _on_popup_hide():
-	last_popup_hide_time = Time.get_ticks_msec()
-
 func _ready():
-	all_characters = CharacterManager.get_character_list()
-	_populate_list(all_characters)
-
+	popup.popup_hide.connect(_on_popup_hide)
 	select_button.pressed.connect(_on_select_button_pressed)
 	search_box.text_changed.connect(_on_search_text_changed)
 	item_list.item_selected.connect(_on_item_selected)
-	popup.popup_hide.connect(_on_popup_hide)
 
-	if not all_characters.is_empty():
-		select_button.text = all_characters[0].capitalize()
+func set_items(items: Array[String], default_selected: String = ""):
+	all_items = items.duplicate()
+	_populate_list(all_items)
+
+	if default_selected != "" and default_selected in all_items:
+		select_button.text = default_selected.capitalize()
+	elif not all_items.is_empty():
+		select_button.text = all_items[0].capitalize()
+	else:
+		select_button.text = "—"
+
+func _on_popup_hide():
+	last_popup_hide_time = Time.get_ticks_msec()
 
 func _on_select_button_pressed():
 	if popup.visible:
 		popup.hide()
 		return
-	
-	# Se o popup acabou de fechar sozinho (clique fora, incluindo no próprio botão),
-	# ignora esse clique em vez de reabrir na hora.
+
 	if Time.get_ticks_msec() - last_popup_hide_time < REOPEN_GUARD_MS:
 		return
-	
+
 	search_box.clear()
-	_populate_list(all_characters)
-	
+	_populate_list(all_items)
+
 	var button_global_pos := select_button.global_position
 	var popup_position := Vector2i(
 		int(button_global_pos.x) + select_button.size.x + 10,
@@ -51,7 +54,7 @@ func _on_select_button_pressed():
 	search_box.grab_focus()
 
 func _on_search_text_changed(new_text: String):
-	var filtered: Array[String] = all_characters.filter(
+	var filtered: Array[String] = all_items.filter(
 		func(name): return name.to_lower().contains(new_text.to_lower())
 	)
 	_populate_list(filtered)
@@ -67,4 +70,4 @@ func _on_item_selected(index: int):
 
 	select_button.text = display_name
 	popup.hide()
-	character_selected.emit(real_name)
+	item_selected.emit(real_name)

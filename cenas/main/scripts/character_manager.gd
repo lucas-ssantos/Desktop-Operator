@@ -30,16 +30,39 @@ func get_character_list() -> Array[String]:
 
 	characters.sort()
 	return characters
+	
+func get_skin_list(character_name: String) -> Array[String]:
+	var skins: Array[String] = []
+	var character_path := CHIBIS_PATH.path_join(character_name)
+	var dir := DirAccess.open(character_path)
+	if dir == null:
+		return skins
 
-func load_character_frames(character_name: String) -> SpriteFrames:
+	dir.list_dir_begin()
+	var folder_name := dir.get_next()
+	while folder_name != "":
+		if dir.current_is_dir() and not folder_name.begins_with("."):
+			skins.append(folder_name)
+		folder_name = dir.get_next()
+	dir.list_dir_end()
+
+	skins.sort()
+	# garante que "default" sempre vem primeiro na lista, mesmo fora de ordem alfabética
+	if skins.has("default"):
+		skins.erase("default")
+		skins.push_front("default")
+
+	return skins
+
+func load_character_frames(character_name: String, skin_name: String = "default") -> SpriteFrames:
 	var frames := SpriteFrames.new()
 	if frames.has_animation("default"):
 		frames.remove_animation("default")
 
-	var character_path := CHIBIS_PATH.path_join(character_name).path_join("frames")
+	var frames_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("frames")
 
 	for anim_name in ANIMATIONS:
-		var anim_path := character_path.path_join(anim_name)
+		var anim_path := frames_path.path_join(anim_name)
 		var textures := _load_textures_sorted(anim_path)
 
 		if textures.is_empty():
@@ -78,3 +101,27 @@ func _load_textures_sorted(folder_path: String) -> Array[Texture2D]:
 			textures.append(texture)
 
 	return textures
+
+func load_character_audio(character_name: String, skin_name: String = "default") -> Dictionary:
+	# Retorna algo como { "click": [stream1, stream2], "idle": [stream1] }
+	var audio_by_category: Dictionary = {}
+	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio")
+
+	var dir := DirAccess.open(audio_path)
+	if dir == null:
+		return audio_by_category
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and (file_name.ends_with(".ogg") or file_name.ends_with(".wav")):
+			var category := file_name.get_basename().split("_")[0]  # "click_01.ogg" -> "click"
+			var stream: AudioStream = load(audio_path.path_join(file_name))
+			if stream:
+				if not audio_by_category.has(category):
+					audio_by_category[category] = []
+				audio_by_category[category].append(stream)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+	return audio_by_category
