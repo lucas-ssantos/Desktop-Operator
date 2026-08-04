@@ -134,4 +134,5 @@ func set_character(character_name: String):
 
 
 func _on_character_dropdown_character_selected(character_name: String) -> void:
+	set_character(character_name)
 	pass # Replace with function body.

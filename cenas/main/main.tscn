@@ -2148,16 +2148,25 @@ oversampling_override = 1.0
 visible = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UI/CharacterDropdown/Popup" unique_id=1046391567]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 96.0
-offset_bottom = 96.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+metadata/_edit_use_anchors_ = true
 
 [node name="SearchBox" type="LineEdit" parent="UI/CharacterDropdown/Popup/VBoxContainer" unique_id=1393576474]
 layout_mode = 2
 
 [node name="ItemList" type="ItemList" parent="UI/CharacterDropdown/Popup/VBoxContainer" unique_id=1022639257]
 layout_mode = 2
+size_flags_vertical = 3
 
 [connection signal="input_event" from="Control/Operator/ClickArea" to="Control/Operator" method="_on_click_area_input_event"]
 [connection signal="character_selected" from="UI/CharacterDropdown" to="Control/Operator" method="_on_character_dropdown_character_selected"]

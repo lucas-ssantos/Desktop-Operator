@@ -15,6 +15,7 @@ const ANIMATION_FPS := {
 func get_character_list() -> Array[String]:
 	var characters: Array[String] = []
 	var dir := DirAccess.open(CHIBIS_PATH)
+	
 	if dir == null:
 		push_error("Não foi possível abrir a pasta: %s" % CHIBIS_PATH)
 		return characters
@@ -35,7 +36,7 @@ func load_character_frames(character_name: String) -> SpriteFrames:
 	if frames.has_animation("default"):
 		frames.remove_animation("default")
 
-	var character_path := CHIBIS_PATH.path_join(character_name)
+	var character_path := CHIBIS_PATH.path_join(character_name).path_join("frames")
 
 	for anim_name in ANIMATIONS:
 		var anim_path := character_path.path_join(anim_name)
