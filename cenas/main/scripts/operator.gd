@@ -122,3 +122,12 @@ func _process(delta):
 	if abs(target_x - position.x) <= arrival_threshold:
 		position.x = target_x
 		_enter_idle()
+
+func set_character(character_name: String):
+	sprite_frames = CharacterManager.load_character_frames(character_name)
+	state = State.IDLE
+	play("idle")
+
+
+func _on_character_dropdown_character_selected(character_name: String) -> void:
+	pass # Replace with function body.

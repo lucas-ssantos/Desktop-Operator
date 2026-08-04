@@ -5,6 +5,9 @@ extends Node
 # Não sabe nada sobre o personagem, animações ou clique.
 
 func _ready():
+	
+	print(CharacterManager)
+	
 	var win := get_window()
 	win.borderless = true
 	win.transparent_bg = true

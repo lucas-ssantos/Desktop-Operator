@@ -514,6 +514,7 @@
 [ext_resource type="Texture2D" uid="uid://cc6bgpsdmco4s" path="res://chibis/nian/frames/walking/frame_00080.png" id="510_kgqu3"]
 [ext_resource type="Script" uid="uid://b766p0jng6kqr" path="res://cenas/main/scripts/close_button.gd" id="513_dje04"]
 [ext_resource type="Script" uid="uid://cwtht5ld6muu3" path="res://cenas/main/scripts/ui.gd" id="513_ilp8h"]
+[ext_resource type="Script" uid="uid://o151vbssbow6" path="res://cenas/main/scripts/character_dropdown.gd" id="515_0wdll"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eoyq7"]
 shader = ExtResource("1_eoyq7")
@@ -837,7 +838,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("106_bx38k")
 }],
-"loop": 1,
+"loop": 0,
 "name": &"click",
 "speed": 5.0
 }, {
@@ -2100,19 +2101,13 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1505425273]
-layout_mode = 0
-offset_right = 1920.0
-offset_bottom = 550.0
-color = Color(1, 1, 1, 0)
-
 [node name="Operator" type="AnimatedSprite2D" parent="Control" unique_id=363406042]
 texture_filter = 1
 material = SubResource("ShaderMaterial_eoyq7")
 position = Vector2(49.000004, 101)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_vabh6")
-animation = &"sleeping"
+animation = &"walking"
 speed_scale = 5.0
 script = ExtResource("55_2dljx")
 
@@ -2122,10 +2117,11 @@ script = ExtResource("55_2dljx")
 position = Vector2(11.6666565, -10)
 shape = SubResource("RectangleShape2D_nusuv")
 
-[node name="UI" type="CanvasLayer" parent="Control" unique_id=1202346665]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1202346665]
+layer = 2
 script = ExtResource("513_ilp8h")
 
-[node name="CloseButton" type="Button" parent="Control/UI" unique_id=826698927]
+[node name="CloseButton" type="Button" parent="UI" unique_id=826698927]
 offset_left = 626.0
 offset_right = 655.0
 offset_bottom = 31.0
@@ -2135,4 +2131,33 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_ilp8h")
 text = "X"
 script = ExtResource("513_dje04")
 
+[node name="CharacterDropdown" type="Control" parent="UI" unique_id=1766115558]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("515_0wdll")
+
+[node name="SelectButton" type="Button" parent="UI/CharacterDropdown" unique_id=1121198713]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="Popup" type="PopupPanel" parent="UI/CharacterDropdown" unique_id=1972821778]
+oversampling_override = 1.0
+visible = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/CharacterDropdown/Popup" unique_id=1046391567]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 96.0
+offset_bottom = 96.0
+
+[node name="SearchBox" type="LineEdit" parent="UI/CharacterDropdown/Popup/VBoxContainer" unique_id=1393576474]
+layout_mode = 2
+
+[node name="ItemList" type="ItemList" parent="UI/CharacterDropdown/Popup/VBoxContainer" unique_id=1022639257]
+layout_mode = 2
+
 [connection signal="input_event" from="Control/Operator/ClickArea" to="Control/Operator" method="_on_click_area_input_event"]
+[connection signal="character_selected" from="UI/CharacterDropdown" to="Control/Operator" method="_on_character_dropdown_character_selected"]
