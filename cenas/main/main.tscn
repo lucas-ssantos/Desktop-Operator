@@ -2121,10 +2121,11 @@ layer = 2
 script = ExtResource("513_ilp8h")
 
 [node name="CloseButton" type="Button" parent="UI" unique_id=826698927]
-offset_left = 626.0
-offset_right = 655.0
-offset_bottom = 31.0
-scale = Vector2(0.47596744, 0.47596744)
+offset_left = 611.0
+offset_top = 2.0
+offset_right = 640.0
+offset_bottom = 33.0
+scale = Vector2(0.80380017, 0.80380017)
 theme_override_styles/normal = SubResource("StyleBoxFlat_dje04")
 theme_override_styles/hover = SubResource("StyleBoxFlat_ilp8h")
 text = "X"
