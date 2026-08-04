@@ -45,7 +45,6 @@ func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: 
 
 func _ready():
 	
-	click_area.input_event.connect(_on_click_area_input_event)
 	get_viewport().physics_object_picking = true  # garante que a viewport processa clique em Area2D
 	
 	animation_finished.connect(_on_animation_finished)
