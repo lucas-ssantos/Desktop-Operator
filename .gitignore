@@ -18,3 +18,7 @@ export_credentials.cfg
 # Arquivos temporários do sistema (Linux/editor de texto)
 *~
 .DS_Store
+
+#sprites
+sprites/*
+EXPORTS/*
