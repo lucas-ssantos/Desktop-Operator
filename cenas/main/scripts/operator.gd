@@ -5,9 +5,19 @@ extends AnimatedSprite2D
 @export var max_idle_time: float = 30.0
 @export var arrival_threshold: float = 4.0
 
+@export_group("Sitting")
+@export var sit_chance: float = 0.20  # 20%
+@export var min_sit_time: float = 30.0
+@export var max_sit_time: float = 60.0
+
+@export_group("Sleeping")
+@export var sleep_chance: float = 0.05  # 5% (o restante, 75%, vira "andar")
+@export var min_sleep_time: float = 50.0
+@export var max_sleep_time: float = 90.0
+
 @onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
 
-enum State { IDLE, WALKING, CLICKED }
+enum State { IDLE, WALKING, SITTING, SLEEPING, CLICKED }
 var state: State = State.IDLE
 
 var target_x: float
@@ -53,9 +63,19 @@ func _enter_idle():
 	var wait_time = randf_range(min_idle_time, max_idle_time)
 	await get_tree().create_timer(wait_time).timeout
 	if state == State.IDLE:
-		_pick_new_target()
+		_pick_next_action()
 
-func _pick_new_target():
+func _pick_next_action():
+	var roll = randf()
+
+	if roll < sleep_chance:
+		_start_sleeping()
+	elif roll < sleep_chance + sit_chance:
+		_start_sitting()
+	else:
+		_start_walking()
+
+func _start_walking():
 	var half_width = _get_half_width()
 	var window_width = get_window().size.x
 	var min_x = half_width
@@ -68,6 +88,22 @@ func _pick_new_target():
 
 	state = State.WALKING
 	play("walking")
+
+func _start_sitting():
+	state = State.SITTING
+	play("sitting")
+	var duration = randf_range(min_sit_time, max_sit_time)
+	await get_tree().create_timer(duration).timeout
+	if state == State.SITTING:
+		_enter_idle()
+
+func _start_sleeping():
+	state = State.SLEEPING
+	play("sleeping")
+	var duration = randf_range(min_sleep_time, max_sleep_time)
+	await get_tree().create_timer(duration).timeout
+	if state == State.SLEEPING:
+		_enter_idle()
 
 func _process(delta):
 	if state != State.WALKING:
