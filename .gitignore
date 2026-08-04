@@ -20,5 +20,5 @@ export_credentials.cfg
 .DS_Store
 
 #sprites
-sprites/*
-EXPORTS/*
+chibis/*
+exports/*

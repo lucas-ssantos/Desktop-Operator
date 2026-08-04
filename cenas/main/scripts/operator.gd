@@ -4,8 +4,6 @@ extends AnimatedSprite2D
 @export var min_idle_time: float = 2.0
 @export var max_idle_time: float = 30.0
 @export var arrival_threshold: float = 4.0
-@export var strip_padding: int = 40  # folga vertical pra animações que saltam
-@export var vertical_offset_ratio: float = 5.5
 
 enum State { IDLE, WALKING, CLICKED }
 var state: State = State.IDLE
@@ -21,50 +19,31 @@ func _ready():
 	win.always_on_top = true
 	win.unresizable = true
 
-	var usable_rect: Rect2i
+	# altura vem do tamanho de design do projeto (o mesmo 1920x550 que você vê no editor 2D)
+	var window_height: int = ProjectSettings.get_setting("display/window/size/viewport_height")
 
+	var usable_rect: Rect2i
 	if OS.get_name() == "Windows":
 		usable_rect = DisplayServer.screen_get_usable_rect()
 	else:
-		var full_size = DisplayServer.screen_get_size()
-		usable_rect = Rect2i(Vector2i.ZERO, full_size)
+		usable_rect = Rect2i(Vector2i.ZERO, DisplayServer.screen_get_size())
 
 	screen_width = usable_rect.size.x
-	var strip_height = _get_sprite_height() + strip_padding
-	var floor_y = usable_rect.position.y + usable_rect.size.y - strip_height
+	var floor_y = usable_rect.position.y + usable_rect.size.y - window_height
 
-	win.size = Vector2i(screen_width, strip_height)
-	position.y = strip_height / vertical_offset_ratio
+	win.size = Vector2i(screen_width, window_height)
+	win.position = Vector2i(usable_rect.position.x, floor_y)
 
-	position.y = strip_height / 5.5
+	# NADA de mexer em position.x/position.y do personagem aqui —
+	# fica exatamente onde você deixou no editor
 
 	animation_finished.connect(_on_animation_finished)
-
 	randomize()
 	_enter_idle()
 
-func _get_sprite_height() -> int:
-	if sprite_frames == null:
-		return 96
-	var anim_name := "idle" if sprite_frames.has_animation("idle") else sprite_frames.get_animation_names()[0]
-	var texture := sprite_frames.get_frame_texture(anim_name, 0)
-	return 96 if texture == null else int(texture.get_size().y * scale.y)
-
-func _get_sprite_width() -> int:
-	if sprite_frames == null:
-		return 96
-	var anim_name := "idle" if sprite_frames.has_animation("idle") else sprite_frames.get_animation_names()[0]
-	var texture := sprite_frames.get_frame_texture(anim_name, 0)
-	return 96 if texture == null else int(texture.get_size().x * scale.x)
-
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var half_w = _get_sprite_width() / 2.0
-		var half_h = _get_sprite_height() / 2.0
-		var local_click = event.position  # coordenadas locais da janela, já que é o único viewport
-
-		if abs(local_click.x - position.x) <= half_w and abs(local_click.y - position.y) <= half_h:
-			_enter_clicked()
+		_enter_clicked()
 
 func _enter_clicked():
 	if state == State.CLICKED:
