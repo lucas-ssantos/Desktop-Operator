@@ -9,6 +9,12 @@ signal character_selected(character_name: String)
 
 var all_characters: Array[String] = []
 
+var last_popup_hide_time: int = -1000
+const REOPEN_GUARD_MS: int = 150
+
+func _on_popup_hide():
+	last_popup_hide_time = Time.get_ticks_msec()
+
 func _ready():
 	all_characters = CharacterManager.get_character_list()
 	_populate_list(all_characters)
@@ -16,6 +22,7 @@ func _ready():
 	select_button.pressed.connect(_on_select_button_pressed)
 	search_box.text_changed.connect(_on_search_text_changed)
 	item_list.item_selected.connect(_on_item_selected)
+	popup.popup_hide.connect(_on_popup_hide)
 
 	if not all_characters.is_empty():
 		select_button.text = all_characters[0].capitalize()
@@ -23,6 +30,11 @@ func _ready():
 func _on_select_button_pressed():
 	if popup.visible:
 		popup.hide()
+		return
+	
+	# Se o popup acabou de fechar sozinho (clique fora, incluindo no próprio botão),
+	# ignora esse clique em vez de reabrir na hora.
+	if Time.get_ticks_msec() - last_popup_hide_time < REOPEN_GUARD_MS:
 		return
 	
 	search_box.clear()
