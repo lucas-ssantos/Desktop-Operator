@@ -110,3 +110,7 @@ I use mainly the **Interact, Mopve, Relax, Sit, Sleep aniamtions**, and if doesn
 viewer the files proabably doesn't have it either.
 
 You can also try extract them from the game, we have software for that, but I'm bit lazy to do that...
+
+Contac me trought 
+Discord: re.daemon
+Reddit: u/Bodewilson
