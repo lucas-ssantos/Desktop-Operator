@@ -15,7 +15,7 @@ const ANIMATION_FPS := {
 func get_character_list() -> Array[String]:
 	var characters: Array[String] = []
 	var dir := DirAccess.open(CHIBIS_PATH)
-	
+
 	if dir == null:
 		push_error("Não foi possível abrir a pasta: %s" % CHIBIS_PATH)
 		return characters
@@ -30,7 +30,7 @@ func get_character_list() -> Array[String]:
 
 	characters.sort()
 	return characters
-	
+
 func get_skin_list(character_name: String) -> Array[String]:
 	var skins: Array[String] = []
 	var character_path := CHIBIS_PATH.path_join(character_name)
@@ -47,7 +47,6 @@ func get_skin_list(character_name: String) -> Array[String]:
 	dir.list_dir_end()
 
 	skins.sort()
-	# garante que "default" sempre vem primeiro na lista, mesmo fora de ordem alfabética
 	if skins.has("default"):
 		skins.erase("default")
 		skins.push_front("default")
@@ -78,6 +77,50 @@ func load_character_frames(character_name: String, skin_name: String = "default"
 
 	return frames
 
+var _trailing_digits_regex: RegEx
+
+func _get_trailing_digits_regex() -> RegEx:
+	if _trailing_digits_regex == null:
+		_trailing_digits_regex = RegEx.new()
+		_trailing_digits_regex.compile("\\d+$")
+	return _trailing_digits_regex
+
+func _categorize_audio_file(base_name: String) -> String:
+	# Sem número no final -> categoria própria (ex: "greetings", "talk", "idle")
+	# Com número no final -> pool de variação agrupado (ex: "talk1"/"talk2"/"talk3" -> "talk_variations")
+	var regex := _get_trailing_digits_regex()
+	var result := regex.search(base_name)
+	if result:
+		var prefix := base_name.substr(0, base_name.length() - result.get_string().length())
+		return prefix + "_variations"
+	return base_name
+
+func load_character_audio(character_name: String, skin_name: String = "default") -> Dictionary:
+	# Retorna algo como:
+	# { "greetings": [stream], "talk": [stream], "idle": [stream], "talk_variations": [stream1, stream2, stream3] }
+	var audio_by_category: Dictionary = {}
+	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio")
+
+	var dir := DirAccess.open(audio_path)
+	if dir == null:
+		return audio_by_category
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and (file_name.ends_with(".ogg") or file_name.ends_with(".wav")):
+			var base_name := file_name.get_basename()
+			var category := _categorize_audio_file(base_name)
+			var stream: AudioStream = load(audio_path.path_join(file_name))
+			if stream:
+				if not audio_by_category.has(category):
+					audio_by_category[category] = []
+				audio_by_category[category].append(stream)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+	return audio_by_category
+
 func _load_textures_sorted(folder_path: String) -> Array[Texture2D]:
 	var textures: Array[Texture2D] = []
 	var dir := DirAccess.open(folder_path)
@@ -101,27 +144,3 @@ func _load_textures_sorted(folder_path: String) -> Array[Texture2D]:
 			textures.append(texture)
 
 	return textures
-
-func load_character_audio(character_name: String, skin_name: String = "default") -> Dictionary:
-	# Retorna algo como { "click": [stream1, stream2], "idle": [stream1] }
-	var audio_by_category: Dictionary = {}
-	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio")
-
-	var dir := DirAccess.open(audio_path)
-	if dir == null:
-		return audio_by_category
-
-	dir.list_dir_begin()
-	var file_name := dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir() and (file_name.ends_with(".ogg") or file_name.ends_with(".wav")):
-			var category := file_name.get_basename().split("_")[0]  # "click_01.ogg" -> "click"
-			var stream: AudioStream = load(audio_path.path_join(file_name))
-			if stream:
-				if not audio_by_category.has(category):
-					audio_by_category[category] = []
-				audio_by_category[category].append(stream)
-		file_name = dir.get_next()
-	dir.list_dir_end()
-
-	return audio_by_category

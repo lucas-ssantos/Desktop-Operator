@@ -17,13 +17,12 @@ extends AnimatedSprite2D
 
 @onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
 @onready var click_area: Area2D = $ClickArea
-@onready var audio_player: AudioStreamPlayer2D = $AudioStreamPlayer
+@onready var talk_timer: Node = $TalkTimer
 
 enum State { IDLE, WALKING, SITTING, SLEEPING, CLICKED }
 var state: State = State.IDLE
 
 var target_x: float
-var current_audio: Dictionary = {}
 
 func _get_sprite_width() -> int:
 	if sprite_frames == null:
@@ -53,23 +52,17 @@ func _ready():
 
 func set_character(character_name: String, skin_name: String = "default"):
 	sprite_frames = CharacterManager.load_character_frames(character_name, skin_name)
-	current_audio = CharacterManager.load_character_audio(character_name, skin_name)
 	state = State.IDLE
 	play("idle")
 
-func _play_random_audio(category: String):
-	if not current_audio.has(category) or current_audio[category].is_empty():
-		return
-	var streams: Array = current_audio[category]
-	audio_player.stream = streams[randi() % streams.size()]
-	audio_player.play()
+	talk_timer.set_audio_data(CharacterManager.load_character_audio(character_name, skin_name))
 
 func _enter_clicked():
 	if state == State.CLICKED:
 		return
 	state = State.CLICKED
 	play("click")
-	_play_random_audio("click")
+	talk_timer.play_click_reaction()
 
 func _on_animation_finished():
 	if animation == "click":
