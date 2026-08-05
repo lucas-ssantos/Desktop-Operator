@@ -95,11 +95,44 @@ func _categorize_audio_file(base_name: String) -> String:
 		return prefix + "_variations"
 	return base_name
 
-func load_character_audio(character_name: String, skin_name: String = "default") -> Dictionary:
-	# Retorna algo como:
-	# { "greetings": [stream], "talk": [stream], "idle": [stream], "talk_variations": [stream1, stream2, stream3] }
-	var audio_by_category: Dictionary = {}
+func get_available_languages(character_name: String, skin_name: String) -> Array[String]:
+	var languages := _scan_language_folders(character_name, skin_name)
+	if languages.is_empty() and skin_name != "default":
+		languages = _scan_language_folders(character_name, "default")
+	return languages
+
+func _scan_language_folders(character_name: String, skin_name: String) -> Array[String]:
+	var languages: Array[String] = []
 	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio")
+	var dir := DirAccess.open(audio_path)
+	if dir == null:
+		return languages
+
+	dir.list_dir_begin()
+	var folder_name := dir.get_next()
+	while folder_name != "":
+		if dir.current_is_dir() and not folder_name.begins_with("."):
+			languages.append(folder_name)
+		folder_name = dir.get_next()
+	dir.list_dir_end()
+
+	languages.sort()
+	return languages
+
+func load_character_audio(character_name: String, skin_name: String = "default", language: String = "EN") -> Dictionary:
+	# Retorna algo como:
+	# { "greetings": [stream], "tap": [stream], "idle": [stream], "talk_variations": [stream1, stream2, stream3] }
+	var audio_by_category := _load_audio_from_folder(character_name, skin_name, language)
+
+	# Fallback: se essa skin não tiver nenhum áudio próprio (nesse idioma), usa o da skin "default"
+	if audio_by_category.is_empty() and skin_name != "default":
+		audio_by_category = _load_audio_from_folder(character_name, "default", language)
+
+	return audio_by_category
+
+func _load_audio_from_folder(character_name: String, skin_name: String, language: String) -> Dictionary:
+	var audio_by_category: Dictionary = {}
+	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio").path_join(language)
 
 	var dir := DirAccess.open(audio_path)
 	if dir == null:

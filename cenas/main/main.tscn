@@ -70,7 +70,7 @@ offset_bottom = 40.0
 [node name="Operator" type="AnimatedSprite2D" parent="Control" unique_id=363406042]
 texture_filter = 1
 material = SubResource("ShaderMaterial_eoyq7")
-position = Vector2(49.000004, 101)
+position = Vector2(50, 100)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_6i47d")
 animation = &"click"
@@ -183,5 +183,10 @@ layout_mode = 2
 [node name="ItemList" type="ItemList" parent="UI/SkinDropdown/Popup/VBoxContainer" unique_id=1669851154]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="LanguageButton" type="OptionButton" parent="UI" unique_id=599596951]
+offset_left = 515.0
+offset_right = 555.0
+offset_bottom = 20.0
 
 [connection signal="input_event" from="Control/Operator/ClickArea" to="Control/Operator" method="_on_click_area_input_event"]

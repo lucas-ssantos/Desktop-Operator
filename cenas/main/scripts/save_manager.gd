@@ -5,18 +5,28 @@ extends Node
 const SAVE_PATH := "user://save_data.cfg"
 
 func save_selection(character_name: String, skin_name: String) -> void:
-	var config := ConfigFile.new()
+	var config := _load_config()
 	config.set_value("character", "name", character_name)
 	config.set_value("character", "skin", skin_name)
 	config.save(SAVE_PATH)
 
 func load_selection() -> Dictionary:
-	var config := ConfigFile.new()
-	var err := config.load(SAVE_PATH)
-	if err != OK:
-		return {}
-
+	var config := _load_config()
 	return {
 		"character": config.get_value("character", "name", ""),
 		"skin": config.get_value("character", "skin", "default"),
 	}
+
+func save_language(character_name: String, language: String) -> void:
+	var config := _load_config()
+	config.set_value("languages", character_name, language)
+	config.save(SAVE_PATH)
+
+func load_language(character_name: String) -> String:
+	var config := _load_config()
+	return config.get_value("languages", character_name, "EN")
+
+func _load_config() -> ConfigFile:
+	var config := ConfigFile.new()
+	config.load(SAVE_PATH)  # se o arquivo ainda não existir, config fica vazio (usa os defaults)
+	return config

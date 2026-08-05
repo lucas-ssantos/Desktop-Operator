@@ -50,12 +50,12 @@ func _ready():
 	randomize()
 	_enter_idle()
 
-func set_character(character_name: String, skin_name: String = "default"):
+func set_character(character_name: String, skin_name: String = "default", language: String = "EN"):
 	sprite_frames = CharacterManager.load_character_frames(character_name, skin_name)
 	state = State.IDLE
 	play("idle")
 
-	talk_timer.set_audio_data(CharacterManager.load_character_audio(character_name, skin_name))
+	talk_timer.set_audio_data(CharacterManager.load_character_audio(character_name, skin_name, language))
 
 func _enter_clicked():
 	if state == State.CLICKED:
