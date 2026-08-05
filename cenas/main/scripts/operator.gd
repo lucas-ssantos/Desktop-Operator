@@ -25,6 +25,10 @@ var state: State = State.IDLE
 
 var target_x: float
 
+var current_character_name: String = ""
+var current_skin_name: String = "default"
+var current_language: String = "EN"
+
 func _get_sprite_width() -> int:
 	if sprite_frames == null:
 		return 96
@@ -47,28 +51,41 @@ func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: 
 func _ready():
 	get_viewport().physics_object_picking = true  # garante que a viewport processa clique em Area2D
 
+	TrustManager.trust_changed.connect(_on_trust_changed)
 	animation_finished.connect(_on_animation_finished)
 	randomize()
 	_enter_idle()
 
 func set_character(character_name: String, skin_name: String = "default", language: String = "EN"):
+	current_character_name = character_name
+	current_skin_name = skin_name
+	current_language = language
+
 	sprite_frames = CharacterManager.load_character_frames(character_name, skin_name)
 	state = State.IDLE
 	play("idle")
 
-	talk_timer.set_audio_data(CharacterManager.load_character_audio(character_name, skin_name, language))
+	TrustManager.set_active_character(character_name)
+	var trust := TrustManager.get_trust(character_name)
+	talk_timer.set_audio_data(CharacterManager.load_character_audio(character_name, skin_name, language, trust))
+
+func _on_trust_changed(character_name: String, new_trust: int) -> void:
+	if character_name != current_character_name:
+		return
+	talk_timer.update_audio_data(
+		CharacterManager.load_character_audio(current_character_name, current_skin_name, current_language, new_trust)
+	)
 
 func _enter_clicked():
 	if state == State.CLICKED:
 		return
 	state = State.CLICKED
 
-	if randf() < special_chance and sprite_frames.has_animation("special"):
-		play("special")
-	else:
-		play("click")
+	var is_special := randf() < special_chance and sprite_frames.has_animation("special")
+	play("special" if is_special else "click")
 
 	talk_timer.play_click_reaction()
+	TrustManager.register_click(current_character_name, is_special)
 
 func _on_animation_finished():
 	if animation == "click" or animation == "special":

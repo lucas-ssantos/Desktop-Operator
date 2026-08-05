@@ -26,14 +26,22 @@ func set_audio_data(new_audio_data: Dictionary) -> void:
 	play_greetings()
 	_restart_interval_timer()
 
+func update_audio_data(new_audio_data: Dictionary) -> void:
+	# Usado quando o trust muda em tempo real (não deve tocar greetings de novo,
+	# nem reiniciar a contagem do timer de idle -- só atualiza os pools disponíveis).
+	audio_data = new_audio_data
+
 func play_greetings() -> void:
 	_play_single("greetings")
 
 func play_click_reaction() -> void:
+	if audio_player.playing:
+		return
 	_play_with_variation("tap")
 
 func _on_interval_timeout() -> void:
-	_play_with_variation("idle")
+	if not audio_player.playing:
+		_play_with_variation("idle")
 	_restart_interval_timer()
 
 func _restart_interval_timer() -> void:

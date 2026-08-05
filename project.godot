@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 CharacterManager="*uid://bq7g0r252vxns"
 SaveManager="*uid://1jk01arcoya5"
+TrustManager="*uid://cxvfaxm0t83jh"
 
 [display]
 

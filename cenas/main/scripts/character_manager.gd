@@ -119,7 +119,7 @@ func _scan_language_folders(character_name: String, skin_name: String) -> Array[
 	languages.sort()
 	return languages
 
-func load_character_audio(character_name: String, skin_name: String = "default", language: String = "EN") -> Dictionary:
+func load_character_audio(character_name: String, skin_name: String = "default", language: String = "EN", trust: int = 0) -> Dictionary:
 	# Retorna algo como:
 	# { "greetings": [stream], "tap": [stream], "idle": [stream], "talk_variations": [stream1, stream2, stream3] }
 	var audio_by_category := _load_audio_from_folder(character_name, skin_name, language)
@@ -128,7 +128,40 @@ func load_character_audio(character_name: String, skin_name: String = "default",
 	if audio_by_category.is_empty() and skin_name != "default":
 		audio_by_category = _load_audio_from_folder(character_name, "default", language)
 
-	return audio_by_category
+	return _apply_trust_unlocks(audio_by_category, trust)
+
+func _apply_trust_unlocks(audio_by_category: Dictionary, trust: int) -> Dictionary:
+	var result := audio_by_category.duplicate(true)
+
+	# talk_trust1 (50) / talk_trust2 (100) / talk_trust3 (150)
+	var unlocked_trust_talks := 0
+	if trust >= 150:
+		unlocked_trust_talks = 3
+	elif trust >= 100:
+		unlocked_trust_talks = 2
+	elif trust >= 50:
+		unlocked_trust_talks = 1
+
+	# Funde os talk_trust já desbloqueados no mesmo pool de variações usado no click/idle.
+	# Se os arquivos talk_trust1/2/3 ainda não existirem, "talk_trust_variations" nem aparece
+	# no dicionário -> nada é adicionado, e cai automaticamente no fallback das falas normais.
+	if unlocked_trust_talks > 0 and result.has("talk_trust_variations"):
+		var trust_pool: Array = result["talk_trust_variations"]
+		var unlocked_pool: Array = trust_pool.slice(0, mini(unlocked_trust_talks, trust_pool.size()))
+
+		if not result.has("talk_variations"):
+			result["talk_variations"] = []
+		result["talk_variations"] += unlocked_pool
+
+	result.erase("talk_trust_variations")
+
+	# Trust >= 100: troca o "tap" pelo "trust_tap" -- só se o arquivo já existir.
+	# Sem o arquivo, "trust_tap" nunca aparece no dicionário, então "tap" permanece o normal.
+	if trust >= 100 and result.has("trust_tap") and not result["trust_tap"].is_empty():
+		result["tap"] = result["trust_tap"]
+	result.erase("trust_tap")
+
+	return result
 
 func _load_audio_from_folder(character_name: String, skin_name: String, language: String) -> Dictionary:
 	var audio_by_category: Dictionary = {}
@@ -138,19 +171,25 @@ func _load_audio_from_folder(character_name: String, skin_name: String, language
 	if dir == null:
 		return audio_by_category
 
+	var file_names: Array[String] = []
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
 	while file_name != "":
 		if not dir.current_is_dir() and (file_name.ends_with(".ogg") or file_name.ends_with(".wav")):
-			var base_name := file_name.get_basename()
-			var category := _categorize_audio_file(base_name)
-			var stream: AudioStream = load(audio_path.path_join(file_name))
-			if stream:
-				if not audio_by_category.has(category):
-					audio_by_category[category] = []
-				audio_by_category[category].append(stream)
+			file_names.append(file_name)
 		file_name = dir.get_next()
 	dir.list_dir_end()
+
+	file_names.sort()  # garante talk_trust1 < talk_trust2 < talk_trust3, na ordem certa
+
+	for name in file_names:
+		var base_name := name.get_basename()
+		var category := _categorize_audio_file(base_name)
+		var stream: AudioStream = load(audio_path.path_join(name))
+		if stream:
+			if not audio_by_category.has(category):
+				audio_by_category[category] = []
+			audio_by_category[category].append(stream)
 
 	return audio_by_category
 

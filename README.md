@@ -30,7 +30,7 @@ The idea was born out of love for the Operators from Arknights, bringing these c
 
 ## Future implementations
 
-- **Add characters voices**: Let them talk!
+- **Add more characters voices**: Currently all characters has EN and JP, plus native language if have, I will add KR and CN to all of them (maybe).
 - **New characters**: expand the available roster, allowing you to choose between different Operators to keep you company on screen.
 - **Skin purchases**: visual variations for the characters, available for purchase.
 
@@ -93,10 +93,11 @@ your computer, but you're welcome to ask me for help and give ideas!
 
 ## There is something I can do? How can I help?
 
+**characters sprites**
 Well, the most help would be getting the operators files. I'm using PRTS Wiki, but idk if it's bc they're on the other end
 of the world or if they simple, don't have the files.
 
-Note: Don't use the download button since I get a better result jsut having the raw files and putting them together.
+Note: Don't use the download button since I get a better result just having the raw files and putting them together.
 
 The Arknights chibis use Spine, a software to rig and animate the sprites of the game, you can extract
 this files (.atlas, .skel, .png) and send to me on Discord to add new characters and their skins!
@@ -105,11 +106,8 @@ You can still get this files from PRTS Wiki, opening the web dev tools with F12,
 go to the bottom of the character page and should appear at the bottom the build_char<etc>.atlas/.skel/.png files. Double click on their
 names and you should be able to download it.
 
-Obs.: As I said, the files **might be incomplete** or idk what, having just attacking animations and such which I **don't** use. 
-I use mainly the **Interact, Mopve, Relax, Sit, Sleep aniamtions**, and if doesn't appear this options to you on to choose on their
-viewer the files proabably doesn't have it either.
-
-You can also try extract them from the game, we have software for that, but I'm bit lazy to do that...
+**characters voices**
+You can get those in Arknits Tera Wiki, go to a character profile then to the dialogues tab.
 
 Contac me trought 
 Discord: re.daemon
