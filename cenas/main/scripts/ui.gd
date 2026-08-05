@@ -9,6 +9,7 @@ const DEFAULT_LANGUAGE := "EN"
 @onready var character_dropdown: Control = $CharacterDropdown
 @onready var skin_dropdown: Control = $SkinDropdown
 @onready var language_button: OptionButton = $LanguageButton
+@onready var trust_bar: ProgressBar = $TrustBar
 @onready var operator: AnimatedSprite2D = get_node(operator_path)
 
 var current_character: String = ""
@@ -20,6 +21,7 @@ func _ready():
 	character_dropdown.modulate.a = 0.0
 	skin_dropdown.modulate.a = 0.0
 	language_button.modulate.a = 0.0
+	trust_bar.modulate.a = 0.0
 	close_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	character_dropdown.mouse_filter = Control.MOUSE_FILTER_STOP
 	skin_dropdown.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -106,6 +108,8 @@ func _apply_selection(character_name: String, skin_name: String, language: Strin
 	SaveManager.save_selection(current_character, current_skin)
 	SaveManager.save_language(current_character, current_language)
 
+	trust_bar.track_character(current_character)
+
 	var languages := CharacterManager.get_available_languages(current_character, current_skin)
 	_populate_language_button(languages, current_language)
 
@@ -125,9 +129,11 @@ func _on_mouse_entered():
 	create_tween().tween_property(character_dropdown, "modulate:a", 1.0, 0.15)
 	create_tween().tween_property(skin_dropdown, "modulate:a", 1.0, 0.15)
 	create_tween().tween_property(language_button, "modulate:a", 1.0, 0.15)
+	create_tween().tween_property(trust_bar, "modulate:a", 1.0, 0.15)
 
 func _on_mouse_exited():
 	create_tween().tween_property(close_button, "modulate:a", 0.0, 0.15)
 	create_tween().tween_property(character_dropdown, "modulate:a", 0.0, 0.15)
 	create_tween().tween_property(skin_dropdown, "modulate:a", 0.0, 0.15)
 	create_tween().tween_property(language_button, "modulate:a", 0.0, 0.15)
+	create_tween().tween_property(trust_bar, "modulate:a", 0.0, 0.15)

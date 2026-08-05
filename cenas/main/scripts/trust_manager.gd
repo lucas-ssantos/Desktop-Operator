@@ -16,7 +16,6 @@ const CLICK_TRUST_AMOUNT := 3
 const SPECIAL_CLICK_TRUST_AMOUNT := 5  # quando o clique solta a animação especial
 
 var current_active_character: String = ""
-var _last_click_trust_time: Dictionary = {}  # character_name -> Time.get_ticks_msec()
 
 var _passive_timer: Timer
 
@@ -47,14 +46,16 @@ func add_trust(character_name: String, amount: int) -> int:
 	return new_value
 
 func register_click(character_name: String, was_special: bool) -> void:
-	var now := Time.get_ticks_msec()
-	var last_time: int = _last_click_trust_time.get(character_name, -999999999)
-	var cooldown_ms := int(CLICK_TRUST_COOLDOWN * 1000.0)
+	var config := _load_config()
+	var last_time: float = config.get_value("click_cooldown", character_name, 0.0)
+	var now := Time.get_unix_time_from_system()
 
-	if now - last_time < cooldown_ms:
+	if now - last_time < CLICK_TRUST_COOLDOWN:
 		return  # ainda em cooldown, esse clique não rende trust
 
-	_last_click_trust_time[character_name] = now
+	config.set_value("click_cooldown", character_name, now)
+	config.save(SAVE_PATH)
+
 	var amount := SPECIAL_CLICK_TRUST_AMOUNT if was_special else CLICK_TRUST_AMOUNT
 	add_trust(character_name, amount)
 

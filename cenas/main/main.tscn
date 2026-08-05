@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dn5eq7y5k4408"]
 
 [ext_resource type="Script" uid="uid://dh6cj8a74jo7n" path="res://cenas/main/scripts/main.gd" id="1_x46m8"]
+[ext_resource type="Script" uid="uid://c822q44m4md8m" path="res://cenas/main/scripts/trust_bar.gd" id="8_6i47d"]
 [ext_resource type="Script" uid="uid://cctl4f4bdj0yg" path="res://cenas/main/scripts/operator.gd" id="55_2dljx"]
 [ext_resource type="Script" uid="uid://g0somavvaahb" path="res://cenas/main/scripts/talk_timer.gd" id="513_c30by"]
 [ext_resource type="Script" uid="uid://b766p0jng6kqr" path="res://cenas/main/scripts/close_button.gd" id="513_dje04"]
@@ -70,6 +71,9 @@ corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
 corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6i47d"]
+bg_color = Color(0.95, 0.61085, 0.3515, 1)
 
 [node name="Main" type="Node2D" unique_id=1033299362]
 script = ExtResource("1_x46m8")
@@ -162,8 +166,8 @@ size_flags_vertical = 3
 [node name="SkinDropdown" type="Control" parent="UI" unique_id=200679525]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 108.0
-offset_right = 148.0
+offset_left = 49.0
+offset_right = 89.0
 offset_bottom = 40.0
 script = ExtResource("515_0wdll")
 
@@ -201,5 +205,31 @@ size_flags_vertical = 3
 offset_left = 515.0
 offset_right = 555.0
 offset_bottom = 20.0
+
+[node name="TrustBar" type="ProgressBar" parent="UI" unique_id=1994216140]
+custom_minimum_size = Vector2(20, 185)
+offset_left = 622.0
+offset_top = 40.0
+offset_right = 642.0
+offset_bottom = 225.0
+scale = Vector2(0.6786621, 0.55999947)
+theme_override_styles/fill = SubResource("StyleBoxFlat_6i47d")
+max_value = 200.0
+fill_mode = 3
+show_percentage = false
+script = ExtResource("8_6i47d")
+
+[node name="ValueLabel" type="Label" parent="UI/TrustBar" unique_id=1857881071]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -23.575832
+offset_top = 46.78586
+offset_right = 76.424164
+offset_bottom = 69.78586
+grow_vertical = 2
+rotation = -1.5707964
 
 [connection signal="input_event" from="Control/Operator/ClickArea" to="Control/Operator" method="_on_click_area_input_event"]
