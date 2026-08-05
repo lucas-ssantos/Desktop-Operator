@@ -4,6 +4,7 @@ extends AnimatedSprite2D
 @export var min_idle_time: float = 2.0
 @export var max_idle_time: float = 30.0
 @export var arrival_threshold: float = 4.0
+@export var special_chance: float = 0.01  # 1%
 
 @export_group("Sitting")
 @export var sit_chance: float = 0.20  # 20%
@@ -61,11 +62,16 @@ func _enter_clicked():
 	if state == State.CLICKED:
 		return
 	state = State.CLICKED
-	play("click")
+
+	if randf() < special_chance and sprite_frames.has_animation("special"):
+		play("special")
+	else:
+		play("click")
+
 	talk_timer.play_click_reaction()
 
 func _on_animation_finished():
-	if animation == "click":
+	if animation == "click" or animation == "special":
 		_enter_idle()
 
 func _enter_idle():

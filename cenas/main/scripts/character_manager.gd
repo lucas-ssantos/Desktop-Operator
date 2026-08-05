@@ -1,7 +1,7 @@
 extends Node
 
 const CHIBIS_PATH := "res://chibis/"
-const ANIMATIONS := ["idle", "walking", "sitting", "sleeping", "click"]
+const ANIMATIONS := ["idle", "walking", "sitting", "sleeping", "click", "special"]
 const LOOPING_ANIMATIONS := ["idle", "walking", "sitting", "sleeping"]
 
 const ANIMATION_FPS := {
