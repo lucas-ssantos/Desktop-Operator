@@ -51,6 +51,11 @@ animations = [{
 }, {
 "frames": [],
 "loop": 1,
+"name": &"special",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
 "name": &"walking",
 "speed": 5.0
 }]
@@ -90,7 +95,7 @@ material = SubResource("ShaderMaterial_eoyq7")
 position = Vector2(50, 100)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_6i47d")
-animation = &"click"
+animation = &"special"
 speed_scale = 5.0
 script = ExtResource("55_2dljx")
 
@@ -166,8 +171,8 @@ size_flags_vertical = 3
 [node name="SkinDropdown" type="Control" parent="UI" unique_id=200679525]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 49.0
-offset_right = 89.0
+offset_left = 119.0
+offset_right = 159.0
 offset_bottom = 40.0
 script = ExtResource("515_0wdll")
 

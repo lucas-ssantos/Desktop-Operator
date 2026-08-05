@@ -12,46 +12,48 @@ const ANIMATION_FPS := {
 	"click": 10,
 }
 
+# --- Helpers de listagem ---
+# Usa ResourceLoader.list_directory() em vez de DirAccess: o DirAccess não
+# lista corretamente pastas dentro de um build exportado (.pck), só no editor.
+
+func _list_subfolders(path: String) -> Array[String]:
+	var names: Array[String] = []
+	for entry in ResourceLoader.list_directory(path):
+		if entry.ends_with("/"):
+			var folder_name := entry.trim_suffix("/")
+			if not folder_name.begins_with("."):
+				names.append(folder_name)
+	return names
+
+func _list_files_with_extensions(path: String, extensions: Array[String]) -> Array[String]:
+	var files: Array[String] = []
+	for entry in ResourceLoader.list_directory(path):
+		if not entry.ends_with("/"):
+			var ext := entry.get_extension().to_lower()
+			if ext in extensions:
+				files.append(entry)
+	files.sort()
+	return files
+
+# --- Personagens e skins ---
+
 func get_character_list() -> Array[String]:
-	var characters: Array[String] = []
-	var dir := DirAccess.open(CHIBIS_PATH)
-
-	if dir == null:
-		push_error("Não foi possível abrir a pasta: %s" % CHIBIS_PATH)
-		return characters
-
-	dir.list_dir_begin()
-	var folder_name := dir.get_next()
-	while folder_name != "":
-		if dir.current_is_dir() and not folder_name.begins_with("."):
-			characters.append(folder_name)
-		folder_name = dir.get_next()
-	dir.list_dir_end()
-
+	var characters := _list_subfolders(CHIBIS_PATH)
 	characters.sort()
 	return characters
 
 func get_skin_list(character_name: String) -> Array[String]:
-	var skins: Array[String] = []
 	var character_path := CHIBIS_PATH.path_join(character_name)
-	var dir := DirAccess.open(character_path)
-	if dir == null:
-		return skins
-
-	dir.list_dir_begin()
-	var folder_name := dir.get_next()
-	while folder_name != "":
-		if dir.current_is_dir() and not folder_name.begins_with("."):
-			skins.append(folder_name)
-		folder_name = dir.get_next()
-	dir.list_dir_end()
-
+	var skins := _list_subfolders(character_path)
 	skins.sort()
+
 	if skins.has("default"):
 		skins.erase("default")
 		skins.push_front("default")
 
 	return skins
+
+# --- Frames ---
 
 func load_character_frames(character_name: String, skin_name: String = "default") -> SpriteFrames:
 	var frames := SpriteFrames.new()
@@ -77,6 +79,19 @@ func load_character_frames(character_name: String, skin_name: String = "default"
 
 	return frames
 
+func _load_textures_sorted(folder_path: String) -> Array[Texture2D]:
+	var textures: Array[Texture2D] = []
+	var file_names := _list_files_with_extensions(folder_path, ["png", "webp"])
+
+	for name in file_names:
+		var texture: Texture2D = load(folder_path.path_join(name))
+		if texture:
+			textures.append(texture)
+
+	return textures
+
+# --- Categorização de áudio ---
+
 var _trailing_digits_regex: RegEx
 
 func _get_trailing_digits_regex() -> RegEx:
@@ -86,14 +101,14 @@ func _get_trailing_digits_regex() -> RegEx:
 	return _trailing_digits_regex
 
 func _categorize_audio_file(base_name: String) -> String:
-	# Sem número no final -> categoria própria (ex: "greetings", "talk", "idle")
-	# Com número no final -> pool de variação agrupado (ex: "talk1"/"talk2"/"talk3" -> "talk_variations")
 	var regex := _get_trailing_digits_regex()
 	var result := regex.search(base_name)
 	if result:
 		var prefix := base_name.substr(0, base_name.length() - result.get_string().length())
 		return prefix + "_variations"
 	return base_name
+
+# --- Idiomas ---
 
 func get_available_languages(character_name: String, skin_name: String) -> Array[String]:
 	var languages := _scan_language_folders(character_name, skin_name)
@@ -102,29 +117,16 @@ func get_available_languages(character_name: String, skin_name: String) -> Array
 	return languages
 
 func _scan_language_folders(character_name: String, skin_name: String) -> Array[String]:
-	var languages: Array[String] = []
 	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio")
-	var dir := DirAccess.open(audio_path)
-	if dir == null:
-		return languages
-
-	dir.list_dir_begin()
-	var folder_name := dir.get_next()
-	while folder_name != "":
-		if dir.current_is_dir() and not folder_name.begins_with("."):
-			languages.append(folder_name)
-		folder_name = dir.get_next()
-	dir.list_dir_end()
-
+	var languages := _list_subfolders(audio_path)
 	languages.sort()
 	return languages
 
+# --- Áudio ---
+
 func load_character_audio(character_name: String, skin_name: String = "default", language: String = "EN", trust: int = 0) -> Dictionary:
-	# Retorna algo como:
-	# { "greetings": [stream], "tap": [stream], "idle": [stream], "talk_variations": [stream1, stream2, stream3] }
 	var audio_by_category := _load_audio_from_folder(character_name, skin_name, language)
 
-	# Fallback: se essa skin não tiver nenhum áudio próprio (nesse idioma), usa o da skin "default"
 	if audio_by_category.is_empty() and skin_name != "default":
 		audio_by_category = _load_audio_from_folder(character_name, "default", language)
 
@@ -133,7 +135,6 @@ func load_character_audio(character_name: String, skin_name: String = "default",
 func _apply_trust_unlocks(audio_by_category: Dictionary, trust: int) -> Dictionary:
 	var result := audio_by_category.duplicate(true)
 
-	# talk_trust1 (50) / talk_trust2 (100) / talk_trust3 (150)
 	var unlocked_trust_talks := 0
 	if trust >= 150:
 		unlocked_trust_talks = 3
@@ -142,9 +143,6 @@ func _apply_trust_unlocks(audio_by_category: Dictionary, trust: int) -> Dictiona
 	elif trust >= 50:
 		unlocked_trust_talks = 1
 
-	# Funde os talk_trust já desbloqueados no mesmo pool de variações usado no click/idle.
-	# Se os arquivos talk_trust1/2/3 ainda não existirem, "talk_trust_variations" nem aparece
-	# no dicionário -> nada é adicionado, e cai automaticamente no fallback das falas normais.
 	if unlocked_trust_talks > 0 and result.has("talk_trust_variations"):
 		var trust_pool: Array = result["talk_trust_variations"]
 		var unlocked_pool: Array = trust_pool.slice(0, mini(unlocked_trust_talks, trust_pool.size()))
@@ -155,8 +153,6 @@ func _apply_trust_unlocks(audio_by_category: Dictionary, trust: int) -> Dictiona
 
 	result.erase("talk_trust_variations")
 
-	# Trust >= 100: troca o "tap" pelo "trust_tap" -- só se o arquivo já existir.
-	# Sem o arquivo, "trust_tap" nunca aparece no dicionário, então "tap" permanece o normal.
 	if trust >= 100 and result.has("trust_tap") and not result["trust_tap"].is_empty():
 		result["tap"] = result["trust_tap"]
 	result.erase("trust_tap")
@@ -167,20 +163,7 @@ func _load_audio_from_folder(character_name: String, skin_name: String, language
 	var audio_by_category: Dictionary = {}
 	var audio_path := CHIBIS_PATH.path_join(character_name).path_join(skin_name).path_join("audio").path_join(language)
 
-	var dir := DirAccess.open(audio_path)
-	if dir == null:
-		return audio_by_category
-
-	var file_names: Array[String] = []
-	dir.list_dir_begin()
-	var file_name := dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir() and (file_name.ends_with(".ogg") or file_name.ends_with(".wav")):
-			file_names.append(file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
-
-	file_names.sort()  # garante talk_trust1 < talk_trust2 < talk_trust3, na ordem certa
+	var file_names := _list_files_with_extensions(audio_path, ["ogg", "wav"])
 
 	for name in file_names:
 		var base_name := name.get_basename()
@@ -192,27 +175,3 @@ func _load_audio_from_folder(character_name: String, skin_name: String, language
 			audio_by_category[category].append(stream)
 
 	return audio_by_category
-
-func _load_textures_sorted(folder_path: String) -> Array[Texture2D]:
-	var textures: Array[Texture2D] = []
-	var dir := DirAccess.open(folder_path)
-	if dir == null:
-		return textures
-
-	var file_names: Array[String] = []
-	dir.list_dir_begin()
-	var file_name := dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir() and (file_name.ends_with(".png") or file_name.ends_with(".webp")):
-			file_names.append(file_name)
-		file_name = dir.get_next()
-	dir.list_dir_end()
-
-	file_names.sort()
-
-	for name in file_names:
-		var texture: Texture2D = load(folder_path.path_join(name))
-		if texture:
-			textures.append(texture)
-
-	return textures
