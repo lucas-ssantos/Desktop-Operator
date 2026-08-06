@@ -9,10 +9,10 @@ func _ready():
 	print(CharacterManager)
 	
 	var win := get_window()
-	win.borderless = true
+	win.borderless = false
 	win.transparent_bg = true
 	win.always_on_top = true
-	win.unresizable = true
+	win.unresizable = false
 
 	# altura/largura vêm do tamanho de design do projeto
 	# (o mesmo valor que você vê no editor 2D, em Project Settings > Display > Window)
