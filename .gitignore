@@ -7,6 +7,8 @@ export.cfg
 export_credentials.cfg
 /build/
 /exported/
+exports/*
+
 
 # Arquivos de importação gerados automaticamente
 # (o Godot recria a partir dos originais na pasta assets/)
@@ -21,4 +23,3 @@ export_credentials.cfg
 
 #sprites
 chibis/*
-exports/*

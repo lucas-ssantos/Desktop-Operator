@@ -12,6 +12,32 @@ const ANIMATION_FPS := {
 	"click": 10,
 }
 
+func _ready() -> void:
+	_load_external_character_packs()
+
+func _load_external_character_packs() -> void:
+	if OS.has_feature("editor"):
+		return  # no editor, os personagens já estão direto em res://chibis, não precisa carregar pacote externo
+
+	var exe_dir := OS.get_executable_path().get_base_dir()
+	var characters_dir := exe_dir.path_join("characters")
+
+	var dir := DirAccess.open(characters_dir)
+	if dir == null:
+		return  # pasta "characters" não existe -- ok, só significa que não tem personagens extras instalados
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and file_name.ends_with(".pck"):
+			var success := ProjectSettings.load_resource_pack(characters_dir.path_join(file_name))
+			if success:
+				print("Pacote de personagem carregado: ", file_name)
+			else:
+				push_warning("Falha ao carregar pacote de personagem: %s" % file_name)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
 # --- Helpers de listagem ---
 # Usa ResourceLoader.list_directory() em vez de DirAccess: o DirAccess não
 # lista corretamente pastas dentro de um build exportado (.pck), só no editor.
