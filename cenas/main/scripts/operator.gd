@@ -35,6 +35,7 @@ var target_x: float
 var current_character_name: String = ""
 var current_skin_name: String = "default"
 var current_language: String = "EN"
+var auto_skin_change_enabled: bool = true
 
 func _get_sprite_width() -> int:
 	if sprite_frames == null:
@@ -89,8 +90,18 @@ func set_character(character_name: String, skin_name: String = "default", langua
 
 	_restart_skin_rotation_timer()
 
+func set_auto_skin_change_enabled(enabled: bool) -> void:
+	auto_skin_change_enabled = enabled
+	if enabled:
+		_restart_skin_rotation_timer()
+	else:
+		skin_rotation_timer.stop()
+
 func _restart_skin_rotation_timer() -> void:
 	skin_rotation_timer.stop()
+
+	if not auto_skin_change_enabled:
+		return
 
 	var skins := CharacterManager.get_skin_list(current_character_name)
 	if skins.size() <= 1:

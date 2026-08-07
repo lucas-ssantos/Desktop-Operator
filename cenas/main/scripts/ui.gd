@@ -10,7 +10,7 @@ const DEFAULT_LANGUAGE := "EN"
 @onready var skin_dropdown: Control = $SkinDropdown
 @onready var language_button: OptionButton = $LanguageButton
 @onready var trust_bar: ProgressBar = $TrustBar
-@onready var window_edit_toggle: CheckButton = $WindowEditToggle
+@onready var settings_popup: Control = $SettingsPopup
 @onready var operator: AnimatedSprite2D = get_node(operator_path)
 
 var current_character: String = ""
@@ -23,14 +23,12 @@ func _ready():
 	skin_dropdown.modulate.a = 0.0
 	language_button.modulate.a = 0.0
 	trust_bar.modulate.a = 0.0
-	window_edit_toggle.modulate.a = 0.0
+	settings_popup.modulate.a = 0.0
 	close_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	character_dropdown.mouse_filter = Control.MOUSE_FILTER_STOP
 	skin_dropdown.mouse_filter = Control.MOUSE_FILTER_STOP
 	language_button.mouse_filter = Control.MOUSE_FILTER_STOP
-	window_edit_toggle.mouse_filter = Control.MOUSE_FILTER_STOP
-
-	window_edit_toggle.toggled.connect(_on_window_edit_toggled)
+	settings_popup.mouse_filter = Control.MOUSE_FILTER_STOP
 
 	var win := get_window()
 	win.mouse_entered.connect(_on_mouse_entered)
@@ -91,11 +89,6 @@ func _on_language_item_selected(index: int):
 	operator.set_character(current_character, current_skin, current_language)
 	SaveManager.save_language(current_character, current_language)
 
-func _on_window_edit_toggled(enabled: bool) -> void:
-	var win := get_window()
-	win.borderless = not enabled
-	win.unresizable = not enabled
-
 func _resolve_language(character_name: String, skin_name: String) -> String:
 	var available := CharacterManager.get_available_languages(character_name, skin_name)
 	if available.is_empty():
@@ -140,7 +133,7 @@ func _on_mouse_entered():
 	create_tween().tween_property(skin_dropdown, "modulate:a", 1.0, 0.15)
 	create_tween().tween_property(language_button, "modulate:a", 1.0, 0.15)
 	create_tween().tween_property(trust_bar, "modulate:a", 1.0, 0.15)
-	create_tween().tween_property(window_edit_toggle, "modulate:a", 1.0, 0.15)
+	create_tween().tween_property(settings_popup, "modulate:a", 1.0, 0.15)
 
 func _on_mouse_exited():
 	create_tween().tween_property(close_button, "modulate:a", 0.0, 0.15)
@@ -148,4 +141,4 @@ func _on_mouse_exited():
 	create_tween().tween_property(skin_dropdown, "modulate:a", 0.0, 0.15)
 	create_tween().tween_property(language_button, "modulate:a", 0.0, 0.15)
 	create_tween().tween_property(trust_bar, "modulate:a", 0.0, 0.15)
-	create_tween().tween_property(window_edit_toggle, "modulate:a", 0.0, 0.15)
+	create_tween().tween_property(settings_popup, "modulate:a", 0.0, 0.15)
