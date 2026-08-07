@@ -1,5 +1,7 @@
 extends AnimatedSprite2D
 
+signal skin_changed(skin_name: String)
+
 @export var speed: float = 60.0
 @export var min_idle_time: float = 2.0
 @export var max_idle_time: float = 30.0
@@ -16,9 +18,14 @@ extends AnimatedSprite2D
 @export var min_sleep_time: float = 50.0
 @export var max_sleep_time: float = 90.0
 
+@export_group("Skin Rotation")
+@export var min_skin_rotation_interval: float = 3600.0   # 1 hora, em segundos
+@export var max_skin_rotation_interval: float = 10800.0  # 3 horas, em segundos
+
 @onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
 @onready var click_area: Area2D = $ClickArea
 @onready var talk_timer: Node = $TalkTimer
+@onready var skin_rotation_timer: Timer = $SkinRotationTimer
 
 enum State { IDLE, WALKING, SITTING, SLEEPING, CLICKED }
 var state: State = State.IDLE
@@ -53,10 +60,16 @@ func _ready():
 
 	TrustManager.trust_changed.connect(_on_trust_changed)
 	animation_finished.connect(_on_animation_finished)
+
+	skin_rotation_timer.one_shot = true
+	skin_rotation_timer.timeout.connect(_on_skin_rotation_timeout)
+
 	randomize()
 	_enter_idle()
 
 func set_character(character_name: String, skin_name: String = "default", language: String = "EN"):
+	var character_changed := character_name != current_character_name
+
 	current_character_name = character_name
 	current_skin_name = skin_name
 	current_language = language
@@ -67,7 +80,37 @@ func set_character(character_name: String, skin_name: String = "default", langua
 
 	TrustManager.set_active_character(character_name)
 	var trust := TrustManager.get_trust(character_name)
-	talk_timer.set_audio_data(CharacterManager.load_character_audio(character_name, skin_name, language, trust))
+	var audio_data := CharacterManager.load_character_audio(character_name, skin_name, language, trust)
+
+	if character_changed:
+		talk_timer.set_audio_data(audio_data)  # toca "greetings" e reinicia o ciclo de idle
+	else:
+		talk_timer.update_audio_data(audio_data)  # só atualiza os pools, sem cumprimento nem reset
+
+	_restart_skin_rotation_timer()
+
+func _restart_skin_rotation_timer() -> void:
+	skin_rotation_timer.stop()
+
+	var skins := CharacterManager.get_skin_list(current_character_name)
+	if skins.size() <= 1:
+		return  # só uma skin (ou nenhuma) -- não tem pra onde trocar
+
+	skin_rotation_timer.wait_time = randf_range(min_skin_rotation_interval, max_skin_rotation_interval)
+	skin_rotation_timer.start()
+
+func _on_skin_rotation_timeout() -> void:
+	var skins := CharacterManager.get_skin_list(current_character_name)
+	if skins.size() <= 1:
+		return
+
+	# Prioriza sortear uma skin diferente da atual; só repete se não houver outra opção
+	var other_skins := skins.filter(func(s): return s != current_skin_name)
+	var candidates := other_skins if not other_skins.is_empty() else skins
+	var new_skin: String = candidates[randi() % candidates.size()]
+
+	set_character(current_character_name, new_skin, current_language)
+	skin_changed.emit(new_skin)
 
 func _on_trust_changed(character_name: String, new_trust: int) -> void:
 	if character_name != current_character_name:

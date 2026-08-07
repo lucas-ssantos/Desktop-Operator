@@ -7,9 +7,9 @@ Click on it anytime to see a special reaction (WOP).
 
 # !! DISCLAIMER !!
 
-I **DO NOT**, I repeat, I DO **NOT OWN** any of the chibis images, animations or anything else, they're propriety of Hypergryph,
+I **DO NOT**, I repeat, I DO **NOT OWN** any of the chibis images, animations, voices or anything else, they're propriety of Hypergryph,
 a chinese game developer which develops the mobile game Arknights, they have total credit and ownership of
-the arts and animations of each character and skin of this game.
+the arts, animations, voices and everything related to the chibis of each character and skin of this game.
 
 I'm just using for a little non profitabble fan project!!
 
@@ -25,11 +25,14 @@ The idea was born out of love for the Operators from Arknights, bringing these c
 
 - The character naturally alternates between standing still and walking, at varying intervals, giving the feeling that it's truly "alive" on your screen.
 - It moves freely across the width of the screen, choosing new destinations spontaneously.
-- (WOP) Clicking on it triggers a small reaction, making the experience more interactive.
+- Clicking on it triggers a small reaction, making the experience more interactive.
 
 
 ## Future implementations
 
+- **stun animmations**: Make you bully them
+- **entering animation**: Add entering animation when changing characters
+- **make characters change skins on its own**: self explanatory
 - **Add more characters voices**: Currently all characters has EN and JP, plus native language if have, I will add KR and CN to all of them (maybe).
 - **New characters**: expand the available roster, allowing you to choose between different Operators to keep you company on screen.
 - **Skin purchases**: visual variations for the characters, available for purchase.
