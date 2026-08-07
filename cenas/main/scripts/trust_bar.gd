@@ -19,7 +19,7 @@ func _ready():
 
 func track_character(character_name: String) -> void:
 	tracked_character = character_name
-	var trust := TrustManager.get_trust(character_name)
+	var trust: int = TrustManager.get_trust(character_name)
 	value = trust
 	_update_label(trust)
 

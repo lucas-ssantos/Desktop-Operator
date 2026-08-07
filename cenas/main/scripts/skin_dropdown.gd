@@ -2,7 +2,7 @@ extends Control
 
 signal item_selected(item_name: String)
 
-@onready var select_button: Button = $"../../TopLeftGroup/CharacterButton"
+@onready var select_button: Button = $"../../TopLeftGroup/SkinButton"
 @onready var popup: PopupPanel = $Popup
 @onready var search_box: LineEdit = $Popup/VBoxContainer/SearchBox
 @onready var item_list: ItemList = $Popup/VBoxContainer/ItemList

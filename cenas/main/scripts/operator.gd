@@ -80,8 +80,8 @@ func set_character(character_name: String, skin_name: String = "default", langua
 	play("idle")
 
 	TrustManager.set_active_character(character_name)
-	var trust := TrustManager.get_trust(character_name)
-	var audio_data := CharacterManager.load_character_audio(character_name, skin_name, language, trust)
+	var trust: int = TrustManager.get_trust(character_name)
+	var audio_data: Dictionary = CharacterManager.load_character_audio(character_name, skin_name, language, trust)
 
 	if character_changed:
 		talk_timer.set_audio_data(audio_data)  # toca "greetings" e reinicia o ciclo de idle
@@ -103,7 +103,7 @@ func _restart_skin_rotation_timer() -> void:
 	if not auto_skin_change_enabled:
 		return
 
-	var skins := CharacterManager.get_skin_list(current_character_name)
+	var skins: Array[String] = CharacterManager.get_skin_list(current_character_name)
 	if skins.size() <= 1:
 		return  # só uma skin (ou nenhuma) -- não tem pra onde trocar
 
@@ -111,13 +111,14 @@ func _restart_skin_rotation_timer() -> void:
 	skin_rotation_timer.start()
 
 func _on_skin_rotation_timeout() -> void:
-	var skins := CharacterManager.get_skin_list(current_character_name)
+	var skins: Array[String] = CharacterManager.get_skin_list(current_character_name)
 	if skins.size() <= 1:
 		return
 
 	# Prioriza sortear uma skin diferente da atual; só repete se não houver outra opção
-	var other_skins := skins.filter(func(s): return s != current_skin_name)
-	var candidates := other_skins if not other_skins.is_empty() else skins
+	# (Array.filter() sempre devolve um Array sem tipo, mesmo a partir de um Array[String])
+	var other_skins: Array = skins.filter(func(s): return s != current_skin_name)
+	var candidates: Array = other_skins if not other_skins.is_empty() else skins
 	var new_skin: String = candidates[randi() % candidates.size()]
 
 	set_character(current_character_name, new_skin, current_language)

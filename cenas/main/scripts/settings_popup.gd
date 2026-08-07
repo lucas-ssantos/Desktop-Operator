@@ -9,8 +9,9 @@ extends Control
 #         └── AutoSkinToggle (CheckButton)
 
 @export var operator_path: NodePath
+@export var settings_button_path: NodePath
 
-@onready var settings_button: Button = $SettingsButton
+@onready var settings_button: Button = get_node(settings_button_path)
 @onready var popup: PopupPanel = $Popup
 @onready var resize_toggle: CheckButton = $Popup/VBoxContainer/ResizeToggle
 @onready var auto_skin_toggle: CheckButton = $Popup/VBoxContainer/AutoSkinToggle
@@ -23,7 +24,7 @@ const REOPEN_GUARD_MS: int = 150
 func _ready():
 	operator = get_node(operator_path)
 
-	var settings := SaveManager.load_settings()
+	var settings: Dictionary = SaveManager.load_settings()
 	var resize_enabled: bool = settings.get("resize_enabled", false)
 	var auto_skin_enabled: bool = settings.get("auto_skin_change_enabled", true)
 
@@ -49,14 +50,7 @@ func _on_settings_button_pressed():
 	if Time.get_ticks_msec() - last_popup_hide_time < REOPEN_GUARD_MS:
 		return
 
-	var button_global_pos := settings_button.global_position
-	var popup_position := Vector2i(
-		int(button_global_pos.x) + settings_button.size.x + 10,
-		int(button_global_pos.y)
-	)
-	var popup_size := Vector2i(220, 90)
-
-	popup.popup(Rect2i(popup_position, popup_size))
+	popup.popup_centered(Vector2i(220, 90))
 
 func _on_resize_toggled(enabled: bool) -> void:
 	_apply_resize(enabled)
