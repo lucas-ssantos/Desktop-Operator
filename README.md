@@ -27,12 +27,26 @@ The idea was born out of love for the Operators from Arknights, bringing these c
 - It moves freely across the width of the screen, choosing new destinations spontaneously.
 - Clicking on it triggers a small reaction, making the experience more interactive.
 
+## HOW TO GET YOUR CHARACTER IN THE GAME
+
+Because Arknights has so, so many operators, in the end with like a bit more than ten characters the export executable
+starts to get really heavy (almost 1GB!), so I choose to disponible files that you can download and have you pick what character
+you want inside the game.
+
+**To have them inside the game**:
+	1) Downlaod their file in one of the releases or just ask me (contact in the end).
+
+	2) Create a folder in the same area the game executable (.exe or .x86_64) called "characters"
+	
+	3) Put the file of the any operator (or all of them) inside the folder
+	
+	4) Click two times on the executable and it will be in the game!
+
 
 ## Future implementations
 
 - **stun animmations**: Make you bully them
 - **entering animation**: Add entering animation when changing characters
-- **make characters change skins on its own**: self explanatory
 - **Add more characters voices**: Currently all characters has EN and JP, plus native language if have, I will add KR and CN to all of them (maybe).
 - **New characters**: expand the available roster, allowing you to choose between different Operators to keep you company on screen.
 - **Skin purchases**: visual variations for the characters, available for purchase.
