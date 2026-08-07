@@ -8,11 +8,14 @@ func _ready():
 	
 	print(CharacterManager)
 	
+	var settings: Dictionary = SaveManager.load_settings()
+	var resize_enabled: bool = settings.get("resize_enabled", false)
+	
 	var win := get_window()
-	win.borderless = true
+	win.borderless = not resize_enabled
 	win.transparent_bg = true
 	win.always_on_top = true
-	win.unresizable = true
+	win.unresizable = not resize_enabled
 
 	# altura/largura vêm do tamanho de design do projeto
 	# (o mesmo valor que você vê no editor 2D, em Project Settings > Display > Window)

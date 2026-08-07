@@ -22,6 +22,13 @@ signal skin_changed(skin_name: String)
 @export var min_skin_rotation_interval: float = 3600.0   # 1 hora, em segundos
 @export var max_skin_rotation_interval: float = 10800.0  # 3 horas, em segundos
 
+@export_group("Ground Anchor")
+@export var bottom_margin: float = 50.0:  # distância dos "pés" até o fundo da janela
+	set(value):
+		bottom_margin = value
+		if is_inside_tree():
+			_anchor_to_ground()
+
 @onready var click_collision: CollisionShape2D = $ClickArea/CollisionShape2D
 @onready var click_area: Area2D = $ClickArea
 @onready var talk_timer: Node = $TalkTimer
@@ -32,7 +39,7 @@ var state: State = State.IDLE
 
 var target_x: float
 
-var current_character_name: String = ""
+var current_character_name: String = "amiya"
 var current_skin_name: String = "default"
 var current_language: String = "EN"
 var auto_skin_change_enabled: bool = true
@@ -65,8 +72,17 @@ func _ready():
 	skin_rotation_timer.one_shot = true
 	skin_rotation_timer.timeout.connect(_on_skin_rotation_timeout)
 
+	get_window().size_changed.connect(_on_window_resized)
+	_anchor_to_ground()
+
 	randomize()
 	_enter_idle()
+
+func _on_window_resized() -> void:
+	_anchor_to_ground()
+
+func _anchor_to_ground() -> void:
+	position.y = get_window().size.y - bottom_margin
 
 func set_character(character_name: String, skin_name: String = "default", language: String = "EN"):
 	var character_changed := character_name != current_character_name
