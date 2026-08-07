@@ -209,8 +209,8 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="LanguageButton" type="OptionButton" parent="UI" unique_id=599596951]
-offset_left = 515.0
-offset_right = 555.0
+offset_left = 546.0
+offset_right = 586.0
 offset_bottom = 20.0
 
 [node name="TrustBar" type="ProgressBar" parent="UI" unique_id=1994216140]
@@ -248,5 +248,12 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 text = "0/200"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="WindowEditToggle" type="CheckButton" parent="UI" unique_id=2027119838]
+offset_left = 381.0
+offset_top = -6.0
+offset_right = 539.0
+offset_bottom = 25.0
+text = "resize window"
 
 [connection signal="input_event" from="Control/Operator/ClickArea" to="Control/Operator" method="_on_click_area_input_event"]
