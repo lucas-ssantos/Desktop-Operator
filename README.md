@@ -111,6 +111,7 @@ your computer, but you're welcome to ask me for help and give ideas!
 ## There is something I can do? How can I help?
 
 **characters sprites**
+
 Well, the most help would be getting the operators files. I'm using PRTS Wiki, but idk if it's bc they're on the other end
 of the world or if they simple, don't have the files.
 
@@ -123,9 +124,13 @@ You can still get this files from PRTS Wiki, opening the web dev tools with F12,
 go to the bottom of the character page and should appear at the bottom the build_char<etc>.atlas/.skel/.png files. Double click on their
 names and you should be able to download it.
 
+
 **characters voices**
+
 You can get those in Arknits Tera Wiki, go to a character profile then to the dialogues tab.
 
 **Contac me trought**
+
 Discord: re.daemon
+
 Reddit: u/Bodewilson
