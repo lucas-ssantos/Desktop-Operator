@@ -222,6 +222,9 @@ text = "Auto Skin"
 
 [node name="TaskbarToggle" type="CheckButton" parent="UI/Root/PopupGroup/SettingsPopup/Popup/VBoxContainer" unique_id=2074309929]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.875, 0.875, 0.875, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
 text = "Taskbar Height"
 
 [node name="CharacterDropdown" type="Control" parent="UI/Root/PopupGroup" unique_id=1766115558]
