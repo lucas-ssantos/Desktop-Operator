@@ -26,10 +26,11 @@ func load_language(character_name: String) -> String:
 	var config := _load_config()
 	return config.get_value("languages", character_name, "EN")
 
-func save_settings(resize_enabled: bool, auto_skin_change_enabled: bool) -> void:
+func save_settings(resize_enabled: bool, auto_skin_change_enabled: bool, taskbar_mode_enabled: bool) -> void:
 	var config := _load_config()
 	config.set_value("settings", "resize_enabled", resize_enabled)
 	config.set_value("settings", "auto_skin_change_enabled", auto_skin_change_enabled)
+	config.set_value("settings", "taskbar_mode_enabled", taskbar_mode_enabled)
 	config.save(SAVE_PATH)
 
 func load_settings() -> Dictionary:
@@ -37,6 +38,7 @@ func load_settings() -> Dictionary:
 	return {
 		"resize_enabled": config.get_value("settings", "resize_enabled", false),
 		"auto_skin_change_enabled": config.get_value("settings", "auto_skin_change_enabled", true),
+		"taskbar_mode_enabled": config.get_value("settings", "taskbar_mode_enabled", true),
 	}
 
 func _load_config() -> ConfigFile:

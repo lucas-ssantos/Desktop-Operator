@@ -22,8 +22,8 @@ signal skin_changed(skin_name: String)
 @export var min_skin_rotation_interval: float = 3600.0   # 1 hora, em segundos
 @export var max_skin_rotation_interval: float = 10800.0  # 3 horas, em segundos
 
-@export_group("Ground Anchor")
-@export var bottom_margin: float = 50.0:  # distância dos "pés" até o fundo da janela
+@export_group("Ground Anchor") # distância dos "pés" até o fundo da janela
+@export var bottom_margin: float = 70.0:  #por padrão 50
 	set(value):
 		bottom_margin = value
 		if is_inside_tree():
@@ -56,8 +56,8 @@ func _get_sprite_width() -> int:
 func _get_half_width() -> float:
 	if click_collision and click_collision.shape is RectangleShape2D:
 		var rect_shape := click_collision.shape as RectangleShape2D
-		return (rect_shape.size.x / 2.0) * scale.x
-	return _get_sprite_width() / 2.0
+		return (rect_shape.size.x / 2.2) * scale.x
+	return _get_sprite_width() / 2.2
 
 func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
