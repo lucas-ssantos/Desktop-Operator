@@ -126,6 +126,6 @@ names and you should be able to download it.
 **characters voices**
 You can get those in Arknits Tera Wiki, go to a character profile then to the dialogues tab.
 
-**Contac me trought**	 
-Discord: re.daemon	
-Reddit: u/Bodewilson
+**Contac me trought**\n 
+Discord: re.daemon\n
+Reddit: u/Bodewilson\n
