@@ -34,13 +34,13 @@ starts to get really heavy (almost 1GB!), so I choose to disponible files that y
 you want inside the game.
 
 **To have them inside the game**:
-	1) Downlaod their file in one of the releases or just ask me (contact in the end).
+1) Downlaod their file in one of the releases or just ask me (contact in the end).
 
-	2) Create a folder in the same area the game executable (.exe or .x86_64) called "characters"
-	
-	3) Put the file of the any operator (or all of them) inside the folder
-	
-	4) Click two times on the executable and it will be in the game!
+2) Create a folder in the same area the game executable (.exe or .x86_64) called "characters"
+
+3) Put the file of the any operator (or all of them) inside the folder
+
+4) Click two times on the executable and it will be in the game!
 
 
 ## Future implementations
